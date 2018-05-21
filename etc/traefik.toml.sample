@@ -1,0 +1,33 @@
+checkNewVersion = true
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+
+  [entryPoints.https]
+  address = ":443"
+    [entryPoints.https.tls]
+
+  [entryPoints.httpBA]
+  address = ":8081"
+    [entryPoints.httpBA.auth]
+      [entryPoints.httpBA.auth.basic]
+      users = ["You:hashed/password"]
+
+[api]
+entryPoint = "httpBA"
+dashboard = true
+
+[acme]
+  email = "you@domain.com"
+  storage= "/etc/traefik/acme/acme.json"
+  entryPoint = "https"
+  onHostRule = true
+  onDemand = true
+  # Uncomment the line to run on the staging let's encrypt server
+  # Leave comment to go to prod
+  #caServer = "https://acme-staging.api.letsencrypt.org/directory"
+  acmeLogging = true
+
+[acme.httpChallenge]
+  entryPoint = "http"
