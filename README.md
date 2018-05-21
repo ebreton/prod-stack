@@ -3,9 +3,9 @@ README
 
 This repository will provide you with a (not so) basic dockerized web stack :
 
-* a web service based on traefik and nginx
-* a mariaDB (along with a phpmyadmin)
-* a memcached server (along with a phpmemcachedadmin)
+* a web service based on [traefik](https://traefik.io) and [nginx](https://nginx.org/en/)
+* a [mariaDB](https://mariadb.org) (along with a [phpmyadmin](https://www.phpmyadmin.net))
+* a [memcached](https://memcached.org) server (along with a [phpmemcachedadmin](https://github.com/elijaa/phpmemcachedadmin))
 
 Table of Content
 --
@@ -14,7 +14,7 @@ Table of Content
 
 - [Configuration](#configuration)
     - [Pre-requisites](#pre-requisites)
-    - [Setup (in three steps)](#setup-in-three-steps)
+    - [Setup](#setup)
     - [Sanity checks](#sanity-checks)
 - [Components](#components)
     - [Web service](#web-service)
@@ -31,14 +31,14 @@ Table of Content
 ### Pre-requisites
 
 * make
-* docker
-* docker-compose
+* [docker](https://www.docker.com/community-edition)
+* [docker-compose](https://docs.docker.com/compose/install/)
 
-### Setup (in three steps)
+### Setup
 
 1. Copy paste `./etc/traefik.toml.sample` to `./etc/traefik.toml` 
-1. add your email in the `acme` section around line 21. This will allow Traefik to register certificates for you on Let's Encrypt.
-    * as an optionnal step, if you wish to make use of Basic Authentication for some services (like `phpmemcachedadmin`, you need to set your user and hashed password around line 15)
+1. add your email in the `acme` section around [line 21](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L21). This will allow Traefik to register certificates for you on Let's Encrypt.
+1. as an optionnal step, if you wish to make use of Basic Authentication for some services (like traefik `dashboard` or  `phpmemcachedadmin`, you need to set your user and hashed password around [line 15](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L15))
 1. With this, you will have everything set with a one-word single line: `make`
 
         $ make
@@ -61,10 +61,11 @@ You will be able to check that everything went ok either through the logs, or by
     memcached           memcached                       Up 14 minutes ago
     phpmemcacheadmin    jacksoncage/phpmemcachedadmin   Up 14 minutes ago
 
-You should also be able to 
+You should also be able to:
 
-* connect to traefik dashboard
-* connect to phpmyadmin
+* connect to traefik dashboard on <http://localhost:8081/dashboard/>
+* connect to phpmyadmin on <http://localhost/phpmyadmin/>
+* connect to phpmemcachedamdin on <http://localhost:8081/phpmemcacheadmin/>
 
 ## Components
 
