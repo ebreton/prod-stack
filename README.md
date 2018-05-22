@@ -16,6 +16,7 @@ Table of Content
     - [Pre-requisites](#pre-requisites)
     - [Setup](#setup)
     - [Sanity checks](#sanity-checks)
+    - [Router check](#router-check)
 - [Components](#components)
     - [Web service](#web-service)
         - [in common words...](#in-common-words)
@@ -37,8 +38,8 @@ Table of Content
 ### Setup
 
 1. Copy paste `./etc/traefik.toml.sample` to `./etc/traefik.toml` 
-1. add your email in the `acme` section around [line 21](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L21). This will allow Traefik to register certificates for you on Let's Encrypt.
-1. as an optionnal step, if you wish to make use of Basic Authentication for some services (like traefik `dashboard` or  `phpmemcachedadmin`, you need to set your user and hashed password around [line 15](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L15))
+1. add your email in the `acme` section around [line 21](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L21). This will allow `traefik` to register certificates for you on Let's Encrypt.
+1. as an optionnal step, if you wish to make use of Basic Authentication for some services (like traefik `dashboard` or  `phpmemcachedadmin`, you need to set your user and hashed password around [line 15](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L15)). `htpasswd` will help you in this, check [traefic doc](https://docs.traefik.io/configuration/entrypoints/#basic-authentication) for more details
 1. With this, you will have everything set with a one-word single line: `make`
 
         $ make
@@ -63,9 +64,28 @@ You will be able to check that everything went ok either through the logs, or by
 
 You should also be able to:
 
-* connect to traefik dashboard on <http://localhost:8081/dashboard/>
+* connect to traefik dashboard on <http://localhost:8081/dashboard/> (provided you set up Basic Authentication as described in the [Setup](#setup) section above)
 * connect to phpmyadmin on <http://localhost/phpmyadmin/>
 * connect to phpmemcachedamdin on <http://localhost:8081/phpmemcacheadmin/>
+
+### Router check
+
+In order to check that the routing is correctly managed by `nginx` and `traefik`, you can launch a simple [hello-world container](https://github.com/docker/dockercloud-hello-world/blob/master/README.md).
+
+The following command will launch and route this on <http://localhost/hello>. It makes use of labels as described with more details in the following section
+
+    docker run -d --name hello-world --rm \
+    	--network=proxy \
+		--label "traefik.enable=true" \
+		--label "traefik.backend=localhost" \
+		--label "traefik.frontend.entryPoints=http" \
+		--label "traefik.frontend.rule=Host:localhost;PathPrefix:/hello" \
+        dockercloud/hello-world
+
+Check <http://localhost/hello>. You can then stop the container with 
+
+    $ docker stop hello-world
+    hello-world
 
 ## Components
 
@@ -73,7 +93,7 @@ You should also be able to:
 
 #### in common words...
 
-The web service used `nginx` as gateway on port 80. It is responsible for HTTPs redirection, and for any redirections you see fit. Most of the traffic will probably be redirected to `traefik`, the container gateway, which also handles the HTTPs encryption.
+`nginx` is the your entry point: it acts as gateway on port 80. It is responsible for HTTPs redirection, and for any redirections you see fit (configuration samples are provided in ./etc folder) . Most of the traffic will probably be redirected to `traefik`, the container gateway (which handles the HTTPs encryption by the way).
 
     NAMES               IMAGE                           STATUS ago
     nginx-entrypoint    nginx                           Up 14 minutes ago
@@ -81,19 +101,24 @@ The web service used `nginx` as gateway on port 80. It is responsible for HTTPs 
 
 #### step by step
 
-* Nginx redirects http to https
-    * allowing you to define exceptions in an nginx conf
+* Nginx serves requests on port 80
 * Nginx proxies to traeffik
 
+* Nginx can redirect http to https (see [./etc/002-redirects.conf.sample](https://github.com/ebreton/prod-stack/blob/master/etc/002-redirects.conf.sample))
+    * allowing you to define exceptions in an nginx conf, e.g. requests from Let's Encrypt
+* Nginx can redirect domain.com to www.domain.com (see [./etc/001-no-https.conf.sample](https://github.com/ebreton/prod-stack/blob/master/etc/001-no-https.conf.sample))
+
+* Traefik serves requests on port 443 
+    * and 8081, which is used for Basic Authentication
 * Traefik manages the certificates through Let's Encrypt
-* Traefik set up routes automatically to new containers thanks to labels
-    * based on host
-    * or on path
+* Traefik set up routes automatically to new containers thanks to labels (see example in [Router check](#router-check))
 * Traefik proxies to the appropriate container
 
 #### Basic Authentication
 
-Note that you might need Basic Authentication for some services. An entrypoint (`httpBA`) is nearly setup for you on the `./etc/traefik.toml`, you will just need to update your user and password in the config file, around line 15.
+Note that you might need Basic Authentication for some services. An entrypoint (`httpBA`) is nearly setup for you on the `./etc/traefik.toml` and will be available on port 8081. You will just need to update your user and password in the config file, around line 15.
+
+`htpasswd` will help you in this, check [traefic doc](https://docs.traefik.io/configuration/entrypoints/#basic-authentication) for more details
 
 ### Database
 
