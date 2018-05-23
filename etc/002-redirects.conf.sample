@@ -1,6 +1,6 @@
 server {
   listen       80 ;
-  server_name  "~^(?<subdomain>[^.]+)\.(?<domain>[^.]+)\.(?<ext>ch|fr|com)$";
+  server_name  "~^(?<subdomain>[^.]+)\.(?<domain>[^.]+)\.(?<ext>[a-zA-Z]+)$";
 
   location /.well-known {
     proxy_pass   http://traefik;
@@ -13,7 +13,7 @@ server {
 
 server {
   listen       80 ;
-  server_name  "~^(?<domain>[^.]+)\.(?<ext>ch|fr|com)$";
+  server_name  "~^(?<domain>[^.]+)\.(?<ext>[a-zA-Z]+)$";
 
   location  /.well-known {
     proxy_pass   http://traefik;
