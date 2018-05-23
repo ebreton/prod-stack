@@ -38,8 +38,8 @@ Table of Content
 ### Setup
 
 1. Copy paste `./etc/traefik.toml.sample` to `./etc/traefik.toml` 
-1. add your email in the `acme` section around [line 21](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L21). This will allow `traefik` to register certificates for you on Let's Encrypt.
-1. as an optionnal step, if you wish to make use of Basic Authentication for some services (like traefik `dashboard` or  `phpmemcachedadmin`, you need to set your user and hashed password around [line 15](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L15)). `htpasswd` will help you in this, check [traefic doc](https://docs.traefik.io/configuration/entrypoints/#basic-authentication) for more details
+    * add your email in the `acme` section around [line 21](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L21). This will allow `traefik` to register certificates for you on Let's Encrypt.
+    * as an optionnal step, if you wish to make use of Basic Authentication for some services (like traefik `dashboard` or  `phpmemcachedadmin`, you need to set your user and hashed password around [line 15](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L15)). `htpasswd` will help you in this, check [traefic doc](https://docs.traefik.io/configuration/entrypoints/#basic-authentication) for more details
 1. With this, you will have everything set with a one-word single line: `make`
 
         $ make
@@ -60,13 +60,20 @@ You will be able to check that everything went ok either through the logs, or by
     db-shared           mariadb:latest                  Up 14 minutes ago
     phpmyadmin          phpmyadmin/phpmyadmin           Up 14 minutes ago
     memcached           memcached                       Up 14 minutes ago
-    phpmemcacheadmin    jacksoncage/phpmemcachedadmin   Up 14 minutes ago
+    phpmemcachedadmin   jacksoncage/phpmemcachedadmin   Up 14 minutes ago
 
 You should also be able to:
 
 * connect to traefik dashboard on <http://localhost:8081/dashboard/> (provided you set up Basic Authentication as described in the [Setup](#setup) section above)
 * connect to phpmyadmin on <http://localhost/phpmyadmin/>
-* connect to phpmemcachedamdin on <http://localhost:8081/phpmemcacheadmin/>
+* connect to phpmemcachedamdin on <http://localhost:8081/phpmemcachedadmin/>
+
+The URLs above are defined from ./etc/urls.env:
+
+    DEFAULT_PROTOCOL=http
+    PHPMYADMIN_DOMAIN=localhost
+    PHPMYADMIN_PATH=phpmyadmin
+    PHPMEMCACHEDADMIN_DOMAIN=phpmemcachedadmin
 
 ### Router check
 
@@ -130,4 +137,4 @@ Note that you might need Basic Authentication for some services. An entrypoint (
 
     NAMES               IMAGE                           STATUS ago
     memcached           memcached                       Up 14 minutes ago
-    phpmemcacheadmin    jacksoncage/phpmemcachedadmin   Up 14 minutes ago
+    phpmemcachedadmin    jacksoncage/phpmemcachedadmin   Up 14 minutes ago

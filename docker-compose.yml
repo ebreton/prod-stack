@@ -44,6 +44,7 @@ services:
     links:
       - db-shared:db
     env_file:
+      - ./etc/urls.env
       - ./etc/db.env
     environment:
       - PMA_ABSOLUTE_URI=${DEFAULT_PROTOCOL}://${PHPMYADMIN_DOMAIN}/${PHPMYADMIN_PATH}/
@@ -59,21 +60,23 @@ services:
     container_name: memcached
     restart: always
 
-  phpmemcacheadmin:
+  phpmemcachedadmin:
     image: jacksoncage/phpmemcachedadmin
-    container_name: phpmemcacheadmin
+    container_name: phpmemcachedadmin
     restart: always
     depends_on:
       - memcached
     volumes:
       - pmcconfig:/phpmemcachedadmin
+    env_file:
+      - ./etc/urls.env
     expose:
       - 80
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=phpmemcacheadmin"
+      - "traefik.backend=phpmemcachedadmin"
       - "traefik.frontend.entryPoints=httpBA"
-      - "traefik.frontend.rule=Host:${PHPMEMCACHEADMIN_DOMAIN};PathPrefixStrip:/phpmemcacheadmin"
+      - "traefik.frontend.rule=Host:${PHPMEMCACHEDADMIN_DOMAIN};PathPrefixStrip:/phpmemcachedadmin"
 
 networks:
   default:
