@@ -12,7 +12,7 @@ checkNewVersion = true
   address = ":8081"
     [entryPoints.httpBA.auth]
       [entryPoints.httpBA.auth.basic]
-      users = ["You:hashed/password"]
+      users = ["test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"]
 
 [api]
 entryPoint = "httpBA"
