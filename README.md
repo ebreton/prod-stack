@@ -37,17 +37,20 @@ Table of Content
 
 ### Setup
 
-1. Copy paste `./etc/traefik.toml.sample` to `./etc/traefik.toml` 
-    * add your email in the `acme` section around [line 21](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L21). This will allow `traefik` to register certificates for you on Let's Encrypt.
-    * as an optionnal step, if you wish to make use of Basic Authentication for some services (like traefik `dashboard` or  `phpmemcachedadmin`, you need to set your user and hashed password around [line 15](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L15)). `htpasswd` will help you in this, check [traefic doc](https://docs.traefik.io/configuration/entrypoints/#basic-authentication) for more details
-1. With this, you will have everything set with a one-word single line: `make`
+You will have a default runnable stack set with a one-word single line: `make`
 
         $ make
+        cp etc/traefik.toml.sample etc/traefik.toml
         cp etc/db.sample.env etc/db.env
         sed -i s/password/ul73I0PHnsQN8pW1eetFq1NVR67StMWg/g etc/db.env
         Generated etc/db.env
         docker-compose pull
         ...
+
+But you will probably want to customize at least the two following settings:
+
+* set your own email in the `acme` section around [line 21](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L21). This will allow `traefik` to register certificates for you on Let's Encrypt.
+* set your own user for Basic Authentication (used by some services like traefik `dashboard` or `phpmemcachedadmin`). The default is set to _test/test_. Change it to your user and hashed password around [line 15](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L15). `htpasswd` will help you in this, check [traefic doc](https://docs.traefik.io/configuration/entrypoints/#basic-authentication) for more details
 
 ### Sanity checks
 

@@ -8,6 +8,7 @@ setup: init-env pull
 
 init-env:
 ifeq ($(wildcard etc/db.env),)
+	cp etc/traefik.toml.sample etc/traefik.toml
 	cp etc/db.sample.env etc/db.env
 	sed -i s/password/$(SECRET)/g etc/db.env
 	@echo "Generated etc/db.env"
