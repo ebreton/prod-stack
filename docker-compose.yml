@@ -44,7 +44,6 @@ services:
     links:
       - db-shared:db
     env_file:
-      - ./etc/urls.env
       - ./etc/db.env
     environment:
       - PMA_ABSOLUTE_URI=${DEFAULT_PROTOCOL}://${PHPMYADMIN_DOMAIN}/${PHPMYADMIN_PATH}/
@@ -68,8 +67,6 @@ services:
       - memcached
     volumes:
       - pmcconfig:/phpmemcachedadmin
-    env_file:
-      - ./etc/urls.env
     expose:
       - 80
     labels:
