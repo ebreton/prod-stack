@@ -6,7 +6,7 @@ setup: init-env pull
 	docker volume create --name=db_data || true
 	make logs
 
-init-env:
+init-env: check-urls-env
 ifeq ($(wildcard etc/db.env),)
 	cp etc/traefik.toml.sample etc/traefik.toml
 	cp etc/db.sample.env etc/db.env
@@ -16,10 +16,19 @@ else
 	@echo "etc/db.env already exists"
 endif
 
+check-urls-env:
+ifeq ($(wildcard etc/urls.env),)
+	@echo "etc/urls.env file is missing"
+	@exit 1
+else
+include etc/urls.env
+export
+endif
+
 pull:
 	docker-compose pull
 
-up:
+up: check-urls-env
 	docker-compose up -d
 
 down:
