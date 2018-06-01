@@ -25,6 +25,10 @@ include etc/urls.env
 export
 endif
 
+ps:
+	# A lightly formatted version of docker ps
+	docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}} ago'
+
 pull:
 	docker-compose pull
 
