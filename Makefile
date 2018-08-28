@@ -25,6 +25,15 @@ include etc/urls.env
 export
 endif
 
+check-cloud-env:
+ifeq ($(wildcard etc/cloud.env),)
+	@echo "etc/cloud.env file is missing"
+	@exit 1
+else
+include etc/cloud.env
+export
+endif
+
 ps:
 	# A lightly formatted version of docker ps
 	docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}} ago'
@@ -40,3 +49,24 @@ down:
 
 logs: up
 	docker-compose logs --tail 10 -f
+
+##################################
+# Deployment to Application Cloud
+
+login: check-cloud-env
+	docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}
+	cf login -a ${APPCLOUD_URL} -u ${APPCLOUD_USER}
+
+build:
+	# nginx
+	cd nginx && docker build . -t ${DOCKER_HUB_REPONAME}/nginx
+	# traefik
+	cd traefik && docker build --build-arg ADMIN_PORT=${TRAEFIK_ADMIN_PORT} . -t ${DOCKER_HUB_REPONAME}/traefik
+
+push-hub: check-cloud-env
+	docker push ${DOCKER_HUB_REPONAME}/nginx
+	docker push ${DOCKER_HUB_REPONAME}/traefik
+
+push-cloud: check-cloud-env
+	CF_DOCKER_PASSWORD=${DOCKER_HUB_PASSWORD} cf push ${NGINX_APPNAME} --docker-image ${DOCKER_HUB_REPONAME}/nginx  --docker-username ${DOCKER_HUB_USERNAME}
+	CF_DOCKER_PASSWORD=${DOCKER_HUB_PASSWORD} cf push ${TRAEFIK_APPNAME} --docker-image ${DOCKER_HUB_REPONAME}/traefik  --docker-username ${DOCKER_HUB_USERNAME}
