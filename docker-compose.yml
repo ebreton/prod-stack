@@ -1,9 +1,9 @@
 version: '3.5'
 
 networks:
-  frontend:
+  cci_frontend:
     external: true
-  backend:
+  cci_backend:
     external: true
 
 volumes:
@@ -21,8 +21,8 @@ services:
     ports:
       - "80:80"
     networks:
-      - frontend
-      - backend
+      - cci_frontend
+      - cci_backend
     volumes:
        - $PWD/etc/nginx.conf:/etc/nginx/nginx.conf
        - $PWD/etc/proxy.conf:/etc/nginx/proxy.conf
@@ -37,8 +37,8 @@ services:
       - "443:443"
       - "8081:8081"
     networks:
-      - frontend
-      - backend
+      - cci_frontend
+      - cci_backend
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - $PWD/etc/traefik.toml:/etc/traefik/traefik.toml
@@ -49,7 +49,7 @@ services:
     container_name: db-shared
     restart: always
     networks:
-      - backend
+      - cci_backend
     env_file:
       - $PWD/etc/db.env
     volumes:
@@ -60,7 +60,7 @@ services:
     container_name: phpmyadmin
     restart: always
     networks:
-      - backend
+      - cci_backend
     depends_on:
       - db-shared
     links:
@@ -71,10 +71,10 @@ services:
       - PMA_ABSOLUTE_URI=${DEFAULT_PROTOCOL}://${PHPMYADMIN_DOMAIN}/${PHPMYADMIN_PATH}/
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=phpmyadmin"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=${DEFAULT_PROTOCOL}"
-      - "traefik.frontend.rule=Host:${PHPMYADMIN_DOMAIN};PathPrefixStrip:/${PHPMYADMIN_PATH}"
+      - "traefik.cci_backend=phpmyadmin"
+      - "traefik.cci_frontend.passHostHeader=true"
+      - "traefik.cci_frontend.entryPoints=${DEFAULT_PROTOCOL}"
+      - "traefik.cci_frontend.rule=Host:${PHPMYADMIN_DOMAIN};PathPrefixStrip:/${PHPMYADMIN_PATH}"
 
   # memcached:
   #   image: memcached
@@ -93,6 +93,6 @@ services:
   #     - 80
   #   labels:
   #     - "traefik.enable=true"
-  #     - "traefik.backend=phpmemcachedadmin"
-  #     - "traefik.frontend.entryPoints=httpBA"
-  #     - "traefik.frontend.rule=Host:${PHPMEMCACHEDADMIN_DOMAIN};PathPrefixStrip:/phpmemcachedadmin"
+  #     - "traefik.cci_backend=phpmemcachedadmin"
+  #     - "traefik.cci_frontend.entryPoints=httpBA"
+  #     - "traefik.cci_frontend.rule=Host:${PHPMEMCACHEDADMIN_DOMAIN};PathPrefixStrip:/phpmemcachedadmin"
