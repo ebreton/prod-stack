@@ -4,7 +4,6 @@ networks:
   traefik-public:
 
 services:
-
   nginx-entrypoint:
     image: nginx
     container_name: nginx-entrypoint
@@ -22,7 +21,12 @@ services:
     image: traefik:latest
     container_name: traefik
     restart: always
-    command: --docker --docker.exposedbydefault=false --logLevel=INFO
+    command: --docker \
+      --docker.watch \
+      --docker.exposedbydefault=false \
+      --logLevel=DEBUG \
+      --accessLog \
+      --web
     ports:
       - "443:443"
       - "8081:8081"

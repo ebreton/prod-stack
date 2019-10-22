@@ -60,7 +60,7 @@ You will be able to check that everything went ok either through the logs, or by
     NAMES               IMAGE                           STATUS ago
     nginx-entrypoint    nginx                           Up 14 minutes ago
     traefik             traefik:latest                  Up 14 minutes ago
-    db-shared           mariadb:latest                  Up 14 minutes ago
+    db           mariadb:latest                  Up 14 minutes ago
     phpmyadmin          phpmyadmin/phpmyadmin           Up 14 minutes ago
     memcached           memcached                       Up 14 minutes ago
     phpmemcachedadmin   jacksoncage/phpmemcachedadmin   Up 14 minutes ago
@@ -133,7 +133,7 @@ Note that you might need Basic Authentication for some services. An entrypoint (
 ### Database
 
     NAMES               IMAGE                           STATUS ago
-    db-shared           mariadb:latest                  Up 14 minutes ago
+    db           mariadb:latest                  Up 14 minutes ago
     phpmyadmin          phpmyadmin/phpmyadmin           Up 14 minutes ago
 
 ### Caching
