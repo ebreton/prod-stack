@@ -1,0 +1,31 @@
+version: '3.5'
+
+volumes:
+  db_data:
+  webmin_sessions:
+
+services:
+  db:
+    image: mariadb:latest
+    restart: always
+    env_file:
+      - ./etc/db.env
+    volumes:
+      - db_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - ./etc/db.env
+    volumes:
+       - webmin_sessions:/sessions
+    environment:
+      - PMA_ABSOLUTE_URI=${DEFAULT_PROTOCOL}://${PHPMYADMIN_DOMAIN}/${PHPMYADMIN_PATH}/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.entryPoints=${DEFAULT_PROTOCOL}"
+      - "traefik.frontend.rule=Host:${PHPMYADMIN_DOMAIN};PathPrefixStrip:/${PHPMYADMIN_PATH}"
