@@ -1,11 +1,12 @@
 README
 ==
 
-This repository will provide you with a (not so) basic dockerized web stack :
+This repository will provide you with a (modular) basic dockerized web stack :
 
-* a web service based on [traefik](https://traefik.io) and [nginx](https://nginx.org/en/)
-* a [mariaDB](https://mariadb.org) (along with a [phpmyadmin](https://www.phpmyadmin.net))
-* a [memcached](https://memcached.org) server (along with a [phpmemcachedadmin](https://github.com/elijaa/phpmemcachedadmin))
+* `make proxy`: a web service based on [traefik](https://traefik.io) and [nginx](https://nginx.org/en/)
+* `make db`: proxy + a [mariaDB](https://mariadb.org) (along with a [phpmyadmin](https://www.phpmyadmin.net))
+* `make cache`: proxy + a [memcached](https://memcached.org) server (along with a [phpmemcachedadmin](https://github.com/elijaa/phpmemcachedadmin))
+* `make all`: the 3 components above
 
 Table of Content
 --
@@ -37,24 +38,14 @@ Table of Content
 
 ### Setup
 
-You will have a default runnable stack set with a one-word single line: `make`
-
-        $ make
-        cp etc/traefik.toml.sample etc/traefik.toml
-        cp etc/db.sample.env etc/db.env
-        sed -i s/password/ul73I0PHnsQN8pW1eetFq1NVR67StMWg/g etc/db.env
-        Generated etc/db.env
-        docker-compose pull
-        ...
-
-But you will probably want to customize at least the two following settings:
+You will probably want to customize at least the two following settings:
 
 * set your own email in the `acme` section around [line 21](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L21). This will allow `traefik` to register certificates for you on Let's Encrypt.
 * set your own user for Basic Authentication (used by some services like traefik `dashboard` or `phpmemcachedadmin`). The default is set to _test/test_. Change it to your user and hashed password around [line 15](https://github.com/ebreton/prod-stack/blob/master/etc/traefik.toml.sample#L15). `htpasswd` will help you in this, check [traefic doc](https://docs.traefik.io/configuration/entrypoints/#basic-authentication) for more details
 
 ### Sanity checks
 
-You will be able to check that everything went ok either through the logs, or by running `docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}} ago'`
+You will be able to check that everything went ok either through the logs, or by running `make ps`
 
     $ docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}} ago'
     NAMES               IMAGE                           STATUS ago
@@ -71,7 +62,7 @@ You should also be able to:
 * connect to phpmyadmin on <http://localhost/phpmyadmin/>
 * connect to phpmemcachedamdin on <http://localhost:8081/phpmemcachedadmin/>
 
-The URLs above are defined from ./etc/urls.env:
+The URLs above are defined thanks to variable environement with the following default values:
 
     DEFAULT_PROTOCOL=http
     PHPMYADMIN_DOMAIN=localhost
@@ -87,7 +78,6 @@ The following command will launch and route this on <http://localhost/hello>. It
     docker run -d --name hello-world --rm \
     	--network=proxy \
 		--label "traefik.enable=true" \
-		--label "traefik.backend=localhost" \
 		--label "traefik.frontend.entryPoints=http" \
 		--label "traefik.frontend.rule=Host:localhost;PathPrefix:/hello" \
         dockercloud/hello-world
@@ -129,15 +119,3 @@ Check <http://localhost/hello>. You can then stop the container with
 Note that you might need Basic Authentication for some services. An entrypoint (`httpBA`) is nearly setup for you on the `./etc/traefik.toml` and will be available on port 8081. You will just need to update your user and password in the config file, around line 15.
 
 `htpasswd` will help you in this, check [traefic doc](https://docs.traefik.io/configuration/entrypoints/#basic-authentication) for more details
-
-### Database
-
-    NAMES               IMAGE                           STATUS ago
-    db           mariadb:latest                  Up 14 minutes ago
-    phpmyadmin          phpmyadmin/phpmyadmin           Up 14 minutes ago
-
-### Caching
-
-    NAMES               IMAGE                           STATUS ago
-    memcached           memcached                       Up 14 minutes ago
-    phpmemcachedadmin    jacksoncage/phpmemcachedadmin   Up 14 minutes ago
