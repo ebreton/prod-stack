@@ -1,0 +1,27 @@
+version: '3.5'
+
+volumes:
+  pmcconfig:
+
+services:
+
+  memcached:
+    image: memcached
+    container_name: memcached
+    restart: always
+
+  phpmemcachedadmin:
+    image: jacksoncage/phpmemcachedadmin
+    container_name: phpmemcachedadmin
+    restart: always
+    depends_on:
+      - memcached
+    volumes:
+      - pmcconfig:/phpmemcachedadmin
+    expose:
+      - 80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.cci_network=phpmemcachedadmin"
+      - "traefik.traefik-public.entryPoints=httpBA"
+      - "traefik.traefik-public.rule=Host:${PHPMEMCACHEDADMIN_DOMAIN};PathPrefixStrip:/phpmemcachedadmin"

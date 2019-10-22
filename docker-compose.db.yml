@@ -1,0 +1,38 @@
+version: '3.5'
+
+volumes:
+  db_data:
+
+services:
+
+  db-shared:
+    image: mariadb:latest
+    container_name: db-shared
+    restart: always
+    networks:
+      - cci_network
+    env_file:
+      - $PWD/etc/db.env
+    volumes:
+       - db_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    networks:
+      - cci_network
+    depends_on:
+      - db-shared
+    links:
+      - db-shared:db
+    env_file:
+      - ./etc/db.env
+    environment:
+      - PMA_ABSOLUTE_URI=${DEFAULT_PROTOCOL}://${PHPMYADMIN_DOMAIN}/${PHPMYADMIN_PATH}/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.cci_network=phpmyadmin"
+      - "traefik.traefik-public.passHostHeader=true"
+      - "traefik.traefik-public.entryPoints=${DEFAULT_PROTOCOL}"
+      - "traefik.traefik-public.rule=Host:${PHPMYADMIN_DOMAIN};PathPrefixStrip:/${PHPMYADMIN_PATH}"
