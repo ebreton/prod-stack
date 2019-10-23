@@ -1,10 +1,17 @@
 ps:
 	# A lightly formatted version of docker ps
-	docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}} ago'
+	docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}} ago'
 
 
 ###
 # Run NGiny and traefik
+
+TRAEFIK_DOMAIN?=localhost
+TRAEFIK_WEBMIN?=traefik.localhost
+LETSENCRYPT_EMAIL?=admin@domain.com
+CLOUDFLARE_EMAIL?=admin@domain.com
+CLOUDFLARE_API_KEY?=api-key
+
 check-traefik:
 ifeq ($(wildcard etc/traefik.toml),)
 	cp etc/traefik.toml.sample etc/traefik.toml
@@ -14,10 +21,26 @@ ifeq ($(wildcard etc/traefik.toml),)
 endif
 
 proxy: check-traefik
-	docker-compose \
-		-f docker-compose.proxy.yml \
-	config > docker-stack.yml
-	make pull
+	LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL) \
+		CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL} \
+		CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY} \
+		TRAEFIK_DOMAIN=$(TRAEFIK_DOMAIN) \
+		TRAEFIK_WEBMIN=$(TRAEFIK_WEBMIN) \
+		docker-compose \
+			-f docker-compose.proxy.deploy.yml \
+			-f docker-compose.proxy.yml \
+		config > docker-stack.yml
+
+proxy-dev: check-traefik
+	LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL) \
+		CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL} \
+		CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY} \
+		TRAEFIK_DOMAIN=$(TRAEFIK_DOMAIN) \
+		TRAEFIK_WEBMIN=$(TRAEFIK_WEBMIN) \
+		docker-compose \
+			-f docker-compose.proxy.dev.yml \
+			-f docker-compose.proxy.yml \
+		config > docker-stack.yml
 
 
 ###
@@ -48,7 +71,6 @@ db: check-db
 			-f docker-compose.db.yml \
 			-f docker-compose.proxy.yml \
 		config > docker-stack.yml
-	make pull
 
 
 ###
@@ -65,7 +87,6 @@ cache:
 			-f docker-compose.cache.yml \
 			-f docker-compose.proxy.yml \
 		config > docker-stack.yml
-	make pull
 
 
 ###
@@ -80,9 +101,9 @@ all: check-traefik check-db
 		docker-compose \
 			-f docker-compose.db.yml \
 			-f docker-compose.cache.yml \
+			-f docker-compose.dev.yml \
 			-f docker-compose.proxy.yml \
 		config > docker-stack.yml
-	make pull
 
 
 ###

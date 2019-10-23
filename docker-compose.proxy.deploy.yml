@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+
+  traefik:
+    environment:
+      - "CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}"
+      - "CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}"
+      - "TZ=Europe/Zurich"
+    command:
+      - '--log.level=INFO'
+      - '--log.format=json'
+      - '--global.checkNewVersion=false'
+      - '--global.sendAnonymousUsage=false'
+      - '--entryPoints.web.address=:80'
+      - '--entryPoints.web-secure.address=:443'
+      - '--api'
+      - '--api.dashboard'
+      - '--providers.providersThrottleDuration=2s'  # default is 2s
+      - '--providers.docker.watch=true'
+      - '--providers.docker.exposedByDefault=false'
+      - '--providers.docker.swarmMode=false'
+      - '--certificatesresolvers.basic.acme.email=${LETSENCRYPT_EMAIL}'
+      - '--certificatesresolvers.basic.acme.storage=/letsencrypt/acme.json'
+      - '--certificatesresolvers.basic.acme.dnschallenge=true'
+      - '--certificatesresolvers.basic.acme.dnschallenge.provider=cloudflare'
+      - '--certificatesresolvers.basic.acme.dnsChallenge.resolvers=1.1.1.1'
+      - '--certificatesresolvers.basic.acme.dnsChallenge.delayBeforeCheck=0'
+      - '--certificatesresolvers.basic.acme.dnsChallenge.disablepropagationcheck=true'
