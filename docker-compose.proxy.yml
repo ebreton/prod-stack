@@ -1,7 +1,9 @@
 version: '3.7'
 
 networks:
-  traefik-public:
+  default:
+    external:
+      name: traefik-public
 
 services:
   traefik:
