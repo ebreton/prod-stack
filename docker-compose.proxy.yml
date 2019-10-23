@@ -43,17 +43,3 @@ services:
       # DEBUG
       # - '--log.level=DEBUG'
       # - '--certificatesresolvers.cloudflare.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'
-    labels:
-      - "traefik.enable=true"
-      # global redirect to https
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.redirects.rule=hostregexp(`{host:.+}`)"
-      - "traefik.http.routers.redirects.entrypoints=web"
-      - "traefik.http.routers.redirects.middlewares=redirect-to-https"
-      # webmin protected by BasicAuth
-      - "traefik.http.middlewares.ask-basic-auth.basicauth.users=${BASIC_AUTH}"
-      - "traefik.http.routers.webmin.rule=Host(`${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.webmin.entrypoints=websecure"
-      - "traefik.http.routers.webmin.tls.certresolver=cloudflare"
-      - "traefik.http.routers.webmin.service=api@internal"
-      - "traefik.http.routers.webmin.middlewares=ask-basic-auth"

@@ -4,6 +4,7 @@ services:
 
   traefik:
     command:
+      - '--log.level=INFO'
       - '--global.sendAnonymousUsage=false'
       # DOCKER (Dynamic config)
       - '--providers.docker'
@@ -20,3 +21,23 @@ services:
       - '--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json'
       - '--certificatesresolvers.cloudflare.acme.dnschallenge=true'
       - '--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare'
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik-public"
+        - "traefik.docker.lbswarm=true"
+        # global redirect to https
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        - "traefik.http.routers.redirects.rule=hostregexp(`{host:.+}`)"
+        - "traefik.http.routers.redirects.entrypoints=web"
+        - "traefik.http.routers.redirects.middlewares=redirect-to-https"
+        # webmin protected by BasicAuth
+        - "traefik.http.middlewares.ask-basic-auth.basicauth.users=${BASIC_AUTH}"
+        - "traefik.http.routers.webmin.rule=Host(`${TRAEFIK_DOMAIN}`)"
+        - "traefik.http.routers.webmin.entrypoints=websecure"
+        - "traefik.http.routers.webmin.tls.certresolver=cloudflare"
+        - "traefik.http.routers.webmin.service=api@internal"
+        - "traefik.http.routers.webmin.middlewares=ask-basic-auth"
