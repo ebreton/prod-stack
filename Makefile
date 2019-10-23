@@ -9,6 +9,8 @@ check-traefik:
 ifeq ($(wildcard etc/traefik.toml),)
 	cp etc/traefik.toml.sample etc/traefik.toml
 	@echo "Generated etc/traefik.toml"
+	@echo ">> Check values"
+	@exit 1
 endif
 
 proxy: check-traefik
@@ -28,13 +30,17 @@ DEFAULT_PROTOCOL?=http
 PHPMYADMIN_DOMAIN?=localhost
 PHPMYADMIN_PATH?=phpmyadmin
 
-db:
+check-db:
 ifeq ($(wildcard etc/db.env),)
 	cp etc/db.sample.env etc/db.env
 	sed -i s/password_root/$(SECRET_ROOT)/g etc/db.env
 	sed -i s/password_user/$(SECRET_USER)/g etc/db.env
 	@echo "Generated etc/db.env"
-else
+	@echo ">> Check values"
+	@exit 1
+endif
+
+db: check-db
 	DEFAULT_PROTOCOL=$(DEFAULT_PROTOCOL) \
 		PHPMYADMIN_DOMAIN=$(PHPMYADMIN_DOMAIN) \
 		PHPMYADMIN_PATH=$(PHPMYADMIN_PATH) \
@@ -43,7 +49,6 @@ else
 			-f docker-compose.proxy.yml \
 		config > docker-stack.yml
 	make pull
-endif
 
 
 ###
@@ -66,13 +71,7 @@ cache:
 ###
 # Run proxy, DB and memcache
 
-all: check-traefik
-ifeq ($(wildcard etc/db.env),)
-	cp etc/db.sample.env etc/db.env
-	sed -i s/password_root/$(SECRET_ROOT)/g etc/db.env
-	sed -i s/password_user/$(SECRET_USER)/g etc/db.env
-	@echo "Generated etc/db.env"
-else
+all: check-traefik check-db
 	DEFAULT_PROTOCOL=$(DEFAULT_PROTOCOL) \
 		PHPMYADMIN_DOMAIN=$(PHPMYADMIN_DOMAIN) \
 		PHPMYADMIN_PATH=$(PHPMYADMIN_PATH) \
@@ -84,7 +83,6 @@ else
 			-f docker-compose.proxy.yml \
 		config > docker-stack.yml
 	make pull
-endif
 
 
 ###
@@ -93,14 +91,12 @@ endif
 check-stack:
 ifeq ($(wildcard docker-stack.yml),)
 	@echo "docker-stack.yml file is missing"
+	@echo ">> use 'make proxy|db|cache|all'"
 	@exit 1
 endif
 
 pull: check-stack
 	docker-compose -f docker-stack.yml pull
-
-build: check-stack
-	docker-compose -f docker-stack.yml build
 
 up: check-stack
 	docker-compose -f docker-stack.yml up -d
