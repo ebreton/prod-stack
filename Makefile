@@ -24,18 +24,7 @@ LETSENCRYPT_EMAIL?=admin@domain.com
 CLOUDFLARE_EMAIL?=admin@domain.com
 CLOUDFLARE_API_KEY?=api-key
 
-check-traefik: check-env
-ifeq ($(wildcard etc/traefik.toml),)
-	cp etc/traefik.toml.sample etc/traefik.toml
-	@echo "Generated etc/traefik.toml"
-	@echo ">> Check values"
-	@exit 1
-else
-include .env
-export
-endif
-
-proxy: check-traefik
+proxy: check-env
 	LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL) \
 		CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL} \
 		CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY} \
@@ -46,7 +35,7 @@ proxy: check-traefik
 			-f docker-compose.proxy.deploy.yml \
 		config > docker-stack.yml
 
-proxy-dev: check-traefik
+proxy-dev: check-env
 	LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL) \
 		CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL} \
 		CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY} \
@@ -108,7 +97,7 @@ cache:
 ###
 # Run proxy, DB and memcache
 
-all: check-traefik check-db
+all: check-env check-db
 	DEFAULT_PROTOCOL=$(DEFAULT_PROTOCOL) \
 		PHPMYADMIN_DOMAIN=$(PHPMYADMIN_DOMAIN) \
 		PHPMYADMIN_PATH=$(PHPMYADMIN_PATH) \
