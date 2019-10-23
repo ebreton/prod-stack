@@ -4,3 +4,4 @@ db.env
 traefik.toml
 docker-stack.yml
 letsencrypt/acme.json
+.env

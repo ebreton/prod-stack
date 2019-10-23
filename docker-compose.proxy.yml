@@ -6,36 +6,54 @@ networks:
 services:
   traefik:
     image: traefik:v2.0
-    # domainname: ${TRAEFIK_DOMAIN}
     restart: unless-stopped
-    ports:
-      # - '443:443'
-      - '80:80'
-      # The Web UI (enabled by --api.insecure=true)
-      - '8080:8080'
     networks:
       - traefik-public
-    # labels:
-    #   - "traefik.enable=true"
-    #   # middlewares
-    #   - "traefik.http.middlewares.testHeader.headers.framedeny=true"
-    #   - "traefik.http.middlewares.testHeader.headers.sslredirect=true"
-    #   - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    #   - "traefik.http.middlewares.auth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
-    #   # web
-    #   - "traefik.http.routers.traefik.entrypoints=web"
-    #   - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_WEBMIN}`)"
-    #   # - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-    #   # web secure
-    #   - "traefik.http.routers.traefik_https.entrypoints=web-secure"
-    #   - "traefik.http.routers.traefik_https.rule=Host(`${TRAEFIK_WEBMIN}`)"
-    #   - "traefik.http.routers.traefik_https.tls=true"
-    #   - "traefik.http.routers.traefik_https.tls.certresolver=basic"
-    #   # - "traefik.http.routers.traefik_https.service=api@internal"
-    #   # - "traefik.http.routers.traefik_https.tls.domains[0].main=*.${TRAEFIK_DOMAIN}"
-    #   # - "traefik.http.routers.traefik_https.tls.domains[0].sans=${TRAEFIK_DOMAIN}"
-    #   # - "traefik.http.routers.traefik_https.middlewares=auth"
-    #   # global redirect to https
-    #   - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
-    #   - "traefik.http.routers.redirs.entrypoints=web"
-    #   - "traefik.http.routers.redirs.middlewares=redirect-to-https"
+    ports:
+      # HTTP & HTTPS
+      - '80:80'
+      - '443:443'
+      # The Web UI (enabled by --api.insecure=true)
+      - '127.0.0.1:8080:8080'
+    environment:
+      - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
+      - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
+      - TZ=Europe/Zurich
+    command:
+      - '--global.checkNewVersion=true'
+      - '--global.sendAnonymousUsage=false'
+      # DOCKER (Dynamic config)
+      - '--providers.docker'
+      - '--providers.docker.watch=true'
+      - '--providers.docker.endpoint=unix:///var/run/docker.sock'
+      - '--providers.docker.exposedByDefault=false'
+      - '--providers.docker.network=traefik-public'
+      - '--providers.docker.swarmMode=false'
+      # WEBMIN on localhost (8080)
+      - '--api.insecure=true'
+      - '--api.dashboard'
+      # Listen to incoming HTTP requests (80)
+      - '--entryPoints.web.address=:80'
+      # Listen to HTTPS (443)
+      - '--entryPoints.websecure.address=:443'
+      - '--certificatesresolvers.cloudflare.acme.email=${LETSENCRYPT_EMAIL}'
+      - '--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json'
+      - '--certificatesresolvers.cloudflare.acme.dnschallenge=true'
+      - '--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare'
+      # DEBUG
+      # - '--log.level=DEBUG'
+      # - '--certificatesresolvers.cloudflare.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'
+    labels:
+      - "traefik.enable=true"
+      # global redirect to https
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.redirects.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.redirects.entrypoints=web"
+      - "traefik.http.routers.redirects.middlewares=redirect-to-https"
+      # webmin protected by BasicAuth
+      - "traefik.http.middlewares.ask-basic-auth.basicauth.users=${BASIC_AUTH}"
+      - "traefik.http.routers.webmin.rule=Host(`${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.webmin.entrypoints=websecure"
+      - "traefik.http.routers.webmin.tls.certresolver=cloudflare"
+      - "traefik.http.routers.webmin.service=api@internal"
+      - "traefik.http.routers.webmin.middlewares=ask-basic-auth"
