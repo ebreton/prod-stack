@@ -101,7 +101,7 @@ all: check-traefik check-db
 		docker-compose \
 			-f docker-compose.db.yml \
 			-f docker-compose.cache.yml \
-			-f docker-compose.dev.yml \
+			-f docker-compose.proxy.dev.yml \
 			-f docker-compose.proxy.yml \
 		config > docker-stack.yml
 
