@@ -144,5 +144,5 @@ down: check-stack
 stop: check-stack
 	docker-compose -f docker-stack.yml stop
 
-logs: check-stack up
+logs: check-stack
 	docker-compose -f docker-stack.yml logs --tail 10 -f
