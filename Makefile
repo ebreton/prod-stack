@@ -112,6 +112,23 @@ all: check-env check-db
 
 
 ###
+# Add an extra container (for the sake of another example)
+
+HELLO_DOMAIN?=hello.localhost
+
+hello: check-env
+	docker kill hello-world || true
+	HELLO_DOMAIN=$(HELLO_DOMAIN) \
+		docker run -d --name hello-world --rm \
+			--network=prod-stack_traefik-public \
+			--label "traefik.enable=true" \
+			--label "traefik.docker.network=traefik-public" \
+			--label "traefik.http.routers.hello.entrypoints=websecure" \
+			--label "traefik.http.routers.hello.tls.certresolver=cloudflare" \
+			--label "traefik.http.routers.hello.rule=Host(\`$(HELLO_DOMAIN)\`)" \
+		dockercloud/hello-world
+
+###
 # Operational commands
 
 check-stack:
