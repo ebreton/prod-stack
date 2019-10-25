@@ -141,6 +141,10 @@ endif
 pull: check-stack
 	docker-compose -f docker-stack.yml pull
 
+# used for local developement
+build: check-stack proxy-dev
+	docker-compose -f docker-stack.yml build
+
 up: check-stack
 	docker-compose -f docker-stack.yml up -d
 
