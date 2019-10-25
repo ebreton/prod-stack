@@ -17,6 +17,9 @@ services:
       - '443:443'
       # The Web UI (enabled by --api.insecure=true)
       - '127.0.0.1:8080:8080'
+      # Other services
+      - '${SSH_PORT}:22'
+      - '${PG_PORT}:5432'
     environment:
       - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
       - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
@@ -42,6 +45,9 @@ services:
       - '--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json'
       - '--certificatesresolvers.cloudflare.acme.dnschallenge=true'
       - '--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare'
+      # Listen to other services
+      - '--entryPoints.ssh.address=:22'
+      - '--entryPoints.pg.address=:5432'
       # DEBUG
       # - '--log.level=DEBUG'
       # - '--certificatesresolvers.cloudflare.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'

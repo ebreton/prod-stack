@@ -30,6 +30,8 @@ proxy: check-env
 		CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY} \
 		TRAEFIK_DOMAIN=$(TRAEFIK_DOMAIN) \
 		BASIC_AUTH=$(BASIC_AUTH) \
+		SSH_PORT=$(SSH_PORT) \
+		PG_PORT=$(PG_PORT) \
 		docker-compose \
 			-f docker-compose.proxy.yml \
 			-f docker-compose.proxy.deploy.yml \
@@ -41,6 +43,8 @@ proxy-dev: check-env
 		CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY} \
 		TRAEFIK_DOMAIN=$(TRAEFIK_DOMAIN) \
 		BASIC_AUTH=$(BASIC_AUTH) \
+		SSH_PORT=$(SSH_PORT) \
+		PG_PORT=$(PG_PORT) \
 		WHOAMI_DOMAIN=$(WHOAMI_DOMAIN) \
 		docker-compose \
 			-f docker-compose.proxy.yml \
@@ -72,6 +76,8 @@ db: check-db
 	DEFAULT_PROTOCOL=$(DEFAULT_PROTOCOL) \
 		PHPMYADMIN_DOMAIN=$(PHPMYADMIN_DOMAIN) \
 		PHPMYADMIN_PATH=$(PHPMYADMIN_PATH) \
+		SSH_PORT=$(SSH_PORT) \
+		PG_PORT=$(PG_PORT) \
 		docker-compose \
 			-f docker-compose.db.yml \
 			-f docker-compose.proxy.yml \
@@ -88,6 +94,8 @@ cache:
 	DEFAULT_PROTOCOL=$(DEFAULT_PROTOCOL) \
 		PHPMEMCACHEDADMIN_DOMAIN=$(PHPMEMCACHEDADMIN_DOMAIN) \
 		PHPMEMCACHEDADMIN_PATH=$(PHPMEMCACHEDADMIN_PATH) \
+		SSH_PORT=$(SSH_PORT) \
+		PG_PORT=$(PG_PORT) \
 		docker-compose \
 			-f docker-compose.cache.yml \
 			-f docker-compose.proxy.yml \
@@ -103,6 +111,8 @@ all: check-env check-db
 		PHPMYADMIN_PATH=$(PHPMYADMIN_PATH) \
 		PHPMEMCACHEDADMIN_DOMAIN=$(PHPMEMCACHEDADMIN_DOMAIN) \
 		PHPMEMCACHEDADMIN_PATH=$(PHPMEMCACHEDADMIN_PATH) \
+		SSH_PORT=$(SSH_PORT) \
+		PG_PORT=$(PG_PORT) \
 		docker-compose \
 			-f docker-compose.db.yml \
 			-f docker-compose.cache.yml \
