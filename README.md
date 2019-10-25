@@ -26,7 +26,7 @@ Table of Content
 A `.env` file will be created when you will call your first command. Make sure to look at in an change the default values according to your needs, in particular:
 
 * your own email used for let's encrypt. This will allow `traefik` to register certificates for you on Let's Encrypt.
-* your own user for Basic Authentication (used for traefik `dashboard`). The default is set to _test/test_. `htpasswd` will help you in this, check [traefic doc](https://docs.traefik.io/configuration/entrypoints/#basic-authentication) for more details
+* your own user for Basic Authentication (used for traefik `dashboard`). The default is set to _test/test_. `htpasswd` will help you in this, check [traefic doc](https://docs.traefik.io/middlewares/basicauth/) for more details
 
 Here are all the default values:
 
