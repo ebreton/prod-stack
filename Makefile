@@ -33,6 +33,7 @@ proxy: check-env
 		SSH_PORT=$(SSH_PORT) \
 		PG_PORT=$(PG_PORT) \
 		docker-compose \
+			-f docker-compose.networks.yml \
 			-f docker-compose.proxy.yml \
 			-f docker-compose.proxy.deploy.yml \
 		config > docker-stack.yml
@@ -47,6 +48,7 @@ proxy-dev: check-env
 		PG_PORT=$(PG_PORT) \
 		WHOAMI_DOMAIN=$(WHOAMI_DOMAIN) \
 		docker-compose \
+			-f docker-compose.networks.yml \
 			-f docker-compose.proxy.yml \
 			-f docker-compose.proxy.dev.yml \
 		config > docker-stack.yml
@@ -79,6 +81,7 @@ db: check-db
 		SSH_PORT=$(SSH_PORT) \
 		PG_PORT=$(PG_PORT) \
 		docker-compose \
+			-f docker-compose.networks.yml \
 			-f docker-compose.db.yml \
 			-f docker-compose.proxy.yml \
 		config > docker-stack.yml
@@ -97,6 +100,7 @@ cache:
 		SSH_PORT=$(SSH_PORT) \
 		PG_PORT=$(PG_PORT) \
 		docker-compose \
+			-f docker-compose.networks.yml \
 			-f docker-compose.cache.yml \
 			-f docker-compose.proxy.yml \
 		config > docker-stack.yml
@@ -114,6 +118,7 @@ all: check-env check-db
 		SSH_PORT=$(SSH_PORT) \
 		PG_PORT=$(PG_PORT) \
 		docker-compose \
+			-f docker-compose.networks.yml \
 			-f docker-compose.db.yml \
 			-f docker-compose.cache.yml \
 			-f docker-compose.proxy.yml \
@@ -130,9 +135,9 @@ hello: check-env
 	docker kill hello-world || true
 	HELLO_DOMAIN=$(HELLO_DOMAIN) \
 		docker run -d --name hello-world --rm \
-			--network=prod-stack_traefik-public \
+			--network=$(TRAEFIK_PUBLIC_NETWORK) \
 			--label "traefik.enable=true" \
-			--label "traefik.docker.network=traefik-public" \
+			--label "traefik.docker.network=$(TRAEFIK_PUBLIC_NETWORK)" \
 			--label "traefik.http.routers.hello.entrypoints=websecure" \
 			--label "traefik.http.routers.hello.tls.certresolver=cloudflare" \
 			--label "traefik.http.routers.hello.rule=Host(\`$(HELLO_DOMAIN)\`)" \
@@ -149,6 +154,7 @@ ifeq ($(wildcard docker-stack.yml),)
 endif
 
 pull: check-stack
+	docker network create $(TRAEFIK_PUBLIC_NETWORK)
 	docker-compose -f docker-stack.yml pull
 
 # used for local developement

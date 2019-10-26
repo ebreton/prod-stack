@@ -80,7 +80,7 @@ First modify your `/etc/hosts` by adding the following line
 The following command will launch and route this on <https://hello.localhost>. It makes use of labels as described with more details in the following section
 
     docker run -d --name hello-world --rm \
-        --network=prod-stack_traefik-public \
+        --network=traefik-public \
         --label "traefik.enable=true" \
         --label "traefik.docker.network=traefik-public" \
         --label "traefik.http.routers.hello.rule=Host(\`hello.localhost\`)" \

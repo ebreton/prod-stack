@@ -1,16 +1,9 @@
 version: '3.7'
 
-networks:
-  default:
-    external:
-      name: traefik-public
-
 services:
   traefik:
     image: traefik:v2.0
     restart: unless-stopped
-    networks:
-      - traefik-public
     ports:
       # HTTP & HTTPS
       - '80:80'
@@ -32,7 +25,7 @@ services:
       - '--providers.docker.watch=true'
       - '--providers.docker.endpoint=unix:///var/run/docker.sock'
       - '--providers.docker.exposedByDefault=false'
-      - '--providers.docker.network=traefik-public'
+      - '--providers.docker.network=${TRAEFIK_PUBLIC_NETWORK}'
       - '--providers.docker.swarmMode=false'
       # WEBMIN on localhost (8080)
       - '--api.insecure=true'

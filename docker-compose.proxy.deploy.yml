@@ -4,14 +4,14 @@ services:
 
   traefik:
     command:
-      - '--log.level=INFO'
+      - '--global.checkNewVersion=false'
       - '--global.sendAnonymousUsage=false'
       # DOCKER (Dynamic config)
       - '--providers.docker'
       - '--providers.docker.watch=true'
       - '--providers.docker.endpoint=unix:///var/run/docker.sock'
       - '--providers.docker.exposedByDefault=false'
-      - '--providers.docker.network=traefik-public'
+      - '--providers.docker.network=${TRAEFIK_PUBLIC_NETWORK}'
       - '--providers.docker.swarmMode=true'
       # Listen to incoming HTTP requests (80)
       - '--entryPoints.web.address=:80'
@@ -21,13 +21,18 @@ services:
       - '--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json'
       - '--certificatesresolvers.cloudflare.acme.dnschallenge=true'
       - '--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare'
+      # Listen to other services
+      - '--entryPoints.ssh.address=:22'
+      - '--entryPoints.pg.address=:5432'
+      # DEBUG
+      - '--log.level=INFO'
     deploy:
       placement:
         constraints:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        - "traefik.docker.network=traefik-public"
+        - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
         - "traefik.docker.lbswarm=true"
         # global redirect to https
         - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
