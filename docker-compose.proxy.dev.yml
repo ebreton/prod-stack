@@ -14,11 +14,11 @@ services:
       - "traefik.http.routers.redirects.middlewares=redirect-to-https"
       # webmin protected by BasicAuth
       - "traefik.http.middlewares.ask-basic-auth.basicauth.users=${BASIC_AUTH}"
-      - "traefik.http.routers.webmin.rule=Host(`${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.webmin.entrypoints=websecure"
-      - "traefik.http.routers.webmin.tls.certresolver=cloudflare"
-      - "traefik.http.routers.webmin.service=api@internal"
-      - "traefik.http.routers.webmin.middlewares=ask-basic-auth"
+      - "traefik.http.routers.traefik-webmin.rule=Host(`${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.traefik-webmin.entrypoints=websecure"
+      - "traefik.http.routers.traefik-webmin.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-webmin.service=api@internal"
+      - "traefik.http.routers.traefik-webmin.middlewares=ask-basic-auth"
 
   whoami:
     # A container that exposes an API to show its IP address
