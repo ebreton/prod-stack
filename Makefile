@@ -6,8 +6,8 @@ ps:
 check-env:
 ifeq ($(wildcard .env),)
 	cp .sample.env .env
-	@echo "Generated .env"
-	@echo ">> Check values"
+	@echo "Generated \033[32m.env\033[0m"
+	@echo "  \033[31m>> Check its default values\033[0m"
 	@exit 1
 else
 include .env
