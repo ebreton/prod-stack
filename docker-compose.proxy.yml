@@ -9,10 +9,10 @@ services:
       - '80:80'
       - '443:443'
       # The Web UI (enabled by --api.insecure=true)
-      - '127.0.0.1:8080:8080'
+      # - '127.0.0.1:8080:8080'
       # Other services
-      - '${SSH_PORT}:22'
-      - '${PG_PORT}:5432'
+      # - '${SSH_PORT}:22'
+      # - '${PG_PORT}:5432'
     environment:
       - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
       - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
@@ -41,11 +41,11 @@ services:
       # - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=cloudflare'
       - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=ovh'
       # Listen to other services
-      - '--entryPoints.ssh.address=:22'
-      - '--entryPoints.pg.address=:5432'
+      # - '--entryPoints.ssh.address=:22'
+      # - '--entryPoints.pg.address=:5432'
       # WEBMIN on localhost (8080)
       # - '--api.insecure=true'
-      # - '--api.dashboard'
+      - '--api.dashboard'
       # DEBUG
       - '--log.level=INFO'
       # - '--log.level=DEBUG'

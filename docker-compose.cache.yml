@@ -17,6 +17,7 @@ services:
       - pmcconfig:/phpmemcachedadmin
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.frontend.entryPoints=${DEFAULT_PROTOCOL}"
-      - "traefik.frontend.rule=Host:${PHPMEMCACHEDADMIN_DOMAIN};PathPrefixStrip:/${PHPMEMCACHEDADMIN_PATH}"
+      - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
+      - "traefik.http.routers.phpmemcachedadmin.entrypoints=websecure"
+      - "traefik.http.routers.phpmemcachedadmin.tls.certresolver=dnsresolver"
+      - "traefik.http.routers.phpmemcachedadmin.rule=Host:${PHPMEMCACHEDADMIN_DOMAIN};PathPrefixStrip:/${PHPMEMCACHEDADMIN_PATH}"
