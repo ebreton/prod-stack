@@ -21,6 +21,6 @@ services:
       - "traefik.http.middlewares.cacheadmin-stripprefix.stripprefix.prefixes=${PHPMEMCACHEDADMIN_PATH}"
       - "traefik.http.routers.phpmemcachedadmin.entrypoints=websecure"
       - "traefik.http.routers.phpmemcachedadmin.tls.certresolver=dnsresolver"
+      - "traefik.http.routers.phpmemcachedadmin.middlewares=ask-basic-auth"
       - "traefik.http.routers.phpmemcachedadmin.middlewares=cacheadmin-stripprefix"
       - "traefik.http.routers.phpmemcachedadmin.rule=Host(`${PHPMEMCACHEDADMIN_DOMAIN}`) && PathPrefix(`${PHPMEMCACHEDADMIN_PATH}`)"
-      - "traefik.http.routers.phpmemcachedadmin.middlewares=ask-basic-auth"
