@@ -23,10 +23,10 @@ services:
     volumes:
        - webmin_sessions:/sessions
     environment:
-      - PMA_ABSOLUTE_URI=${DEFAULT_PROTOCOL}://${PHPMYADMIN_DOMAIN}/${PHPMYADMIN_PATH}/
+      - PMA_ABSOLUTE_URI=${DEFAULT_PROTOCOL}://${PHPMYADMIN_DOMAIN}${PHPMYADMIN_PATH}/
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
       - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
       - "traefik.http.routers.phpmyadmin.tls.certresolver=dnsresolver"
-      - "traefik.http.routers.phpmyadmin.rule=Host:${PHPMYADMIN_DOMAIN};PathPrefixStrip:/${PHPMYADMIN_PATH}"
+      - "traefik.http.routers.phpmyadmin.rule=Host:${PHPMYADMIN_DOMAIN};PathPrefixStrip:${PHPMYADMIN_PATH}"
