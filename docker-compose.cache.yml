@@ -6,6 +6,7 @@ volumes:
 services:
   memcached:
     image: memcached
+    container_name: memcached
     restart: always
 
   phpmemcachedadmin:
