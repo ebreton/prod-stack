@@ -25,33 +25,18 @@ CLOUDFLARE_EMAIL?=admin@domain.com
 CLOUDFLARE_API_KEY?=api-key
 
 proxy: check-env
-	LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL) \
-		CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL} \
-		CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY} \
-		TRAEFIK_DOMAIN=$(TRAEFIK_DOMAIN) \
-		BASIC_AUTH=$(BASIC_AUTH) \
-		SSH_PORT=$(SSH_PORT) \
-		PG_PORT=$(PG_PORT) \
-		docker-compose \
-			-f docker-compose.networks.yml \
-			-f docker-compose.proxy.yml \
-			-f docker-compose.proxy.deploy.yml \
-		config > docker-stack.yml
+	docker-compose \
+		-f docker-compose.networks.yml \
+		-f docker-compose.proxy.yml \
+		-f docker-compose.proxy.deploy.yml \
+	config > docker-stack.yml
 
-proxy-dev: check-env
-	LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL) \
-		CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL} \
-		CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY} \
-		TRAEFIK_DOMAIN=$(TRAEFIK_DOMAIN) \
-		BASIC_AUTH=$(BASIC_AUTH) \
-		SSH_PORT=$(SSH_PORT) \
-		PG_PORT=$(PG_PORT) \
-		WHOAMI_DOMAIN=$(WHOAMI_DOMAIN) \
-		docker-compose \
-			-f docker-compose.networks.yml \
-			-f docker-compose.proxy.yml \
-			-f docker-compose.proxy.dev.yml \
-		config > docker-stack.yml
+proxy-local: check-env
+	docker-compose \
+		-f docker-compose.networks.yml \
+		-f docker-compose.proxy.yml \
+		-f docker-compose.proxy.local.yml \
+	config > docker-stack.yml
 
 
 ###
@@ -75,16 +60,11 @@ ifeq ($(wildcard etc/db.env),)
 endif
 
 db: check-db
-	DEFAULT_PROTOCOL=$(DEFAULT_PROTOCOL) \
-		PHPMYADMIN_DOMAIN=$(PHPMYADMIN_DOMAIN) \
-		PHPMYADMIN_PATH=$(PHPMYADMIN_PATH) \
-		SSH_PORT=$(SSH_PORT) \
-		PG_PORT=$(PG_PORT) \
-		docker-compose \
-			-f docker-compose.networks.yml \
-			-f docker-compose.db.yml \
-			-f docker-compose.proxy.yml \
-		config > docker-stack.yml
+	docker-compose \
+		-f docker-compose.networks.yml \
+		-f docker-compose.db.yml \
+		-f docker-compose.proxy.yml \
+	config > docker-stack.yml
 
 
 ###
@@ -94,36 +74,24 @@ PHPMEMCACHEDADMIN_DOMAIN?=phpmemcachedadmin
 PHPMEMCACHEDADMIN_PATH?=phpmemcachedadmin
 
 cache:
-	DEFAULT_PROTOCOL=$(DEFAULT_PROTOCOL) \
-		PHPMEMCACHEDADMIN_DOMAIN=$(PHPMEMCACHEDADMIN_DOMAIN) \
-		PHPMEMCACHEDADMIN_PATH=$(PHPMEMCACHEDADMIN_PATH) \
-		SSH_PORT=$(SSH_PORT) \
-		PG_PORT=$(PG_PORT) \
-		docker-compose \
-			-f docker-compose.networks.yml \
-			-f docker-compose.cache.yml \
-			-f docker-compose.proxy.yml \
-		config > docker-stack.yml
+	docker-compose \
+		-f docker-compose.networks.yml \
+		-f docker-compose.cache.yml \
+		-f docker-compose.proxy.yml \
+	config > docker-stack.yml
 
 
 ###
 # Run proxy, DB and memcache
 
 all: check-env check-db
-	DEFAULT_PROTOCOL=$(DEFAULT_PROTOCOL) \
-		PHPMYADMIN_DOMAIN=$(PHPMYADMIN_DOMAIN) \
-		PHPMYADMIN_PATH=$(PHPMYADMIN_PATH) \
-		PHPMEMCACHEDADMIN_DOMAIN=$(PHPMEMCACHEDADMIN_DOMAIN) \
-		PHPMEMCACHEDADMIN_PATH=$(PHPMEMCACHEDADMIN_PATH) \
-		SSH_PORT=$(SSH_PORT) \
-		PG_PORT=$(PG_PORT) \
-		docker-compose \
-			-f docker-compose.networks.yml \
-			-f docker-compose.db.yml \
-			-f docker-compose.cache.yml \
-			-f docker-compose.proxy.yml \
-			-f docker-compose.proxy.dev.yml \
-		config > docker-stack.yml
+	docker-compose \
+		-f docker-compose.networks.yml \
+		-f docker-compose.db.yml \
+		-f docker-compose.cache.yml \
+		-f docker-compose.proxy.yml \
+		-f docker-compose.proxy.local.yml \
+	config > docker-stack.yml
 
 
 ###
@@ -133,15 +101,14 @@ HELLO_DOMAIN?=hello.localhost
 
 hello: check-env
 	docker kill hello-world || true
-	HELLO_DOMAIN=$(HELLO_DOMAIN) \
-		docker run -d --name hello-world --rm \
-			--network=$(TRAEFIK_PUBLIC_NETWORK) \
-			--label "traefik.enable=true" \
-			--label "traefik.docker.network=$(TRAEFIK_PUBLIC_NETWORK)" \
-			--label "traefik.http.routers.hello.entrypoints=websecure" \
-			--label "traefik.http.routers.hello.tls.certresolver=cloudflare" \
-			--label "traefik.http.routers.hello.rule=Host(\`$(HELLO_DOMAIN)\`)" \
-		dockercloud/hello-world
+	docker run -d --name hello-world --rm \
+		--network=$(TRAEFIK_PUBLIC_NETWORK) \
+		--label "traefik.enable=true" \
+		--label "traefik.docker.network=$(TRAEFIK_PUBLIC_NETWORK)" \
+		--label "traefik.http.routers.hello.entrypoints=websecure" \
+		--label "traefik.http.routers.hello.tls.certresolver=dnsresolver" \
+		--label "traefik.http.routers.hello.rule=Host(\`$(HELLO_DOMAIN)\`)" \
+	dockercloud/hello-world
 
 ###
 # Operational commands
@@ -158,7 +125,7 @@ pull: check-stack
 	docker-compose -f docker-stack.yml pull
 
 # used for local developement
-build: check-stack proxy-dev
+build: check-stack proxy-local
 	docker-compose -f docker-stack.yml build
 
 up: check-stack

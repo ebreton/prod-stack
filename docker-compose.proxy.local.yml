@@ -7,6 +7,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
       # global redirect to https
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.routers.redirects.rule=hostregexp(`{host:.+}`)"
@@ -16,7 +17,7 @@ services:
       - "traefik.http.middlewares.ask-basic-auth.basicauth.users=${BASIC_AUTH}"
       - "traefik.http.routers.traefik-webmin.rule=Host(`${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.traefik-webmin.entrypoints=websecure"
-      - "traefik.http.routers.traefik-webmin.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-webmin.tls.certresolver=dnsresolver"
       - "traefik.http.routers.traefik-webmin.service=api@internal"
       - "traefik.http.routers.traefik-webmin.middlewares=ask-basic-auth"
 
@@ -28,5 +29,5 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
       - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls.certresolver=cloudflare"
+      - "traefik.http.routers.whoami.tls.certresolver=dnsresolver"
       - "traefik.http.routers.whoami.rule=Host(`${WHOAMI_DOMAIN}`)"

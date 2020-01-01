@@ -16,6 +16,10 @@ services:
     environment:
       - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
       - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
+      - OVH_ENDPOINT=${OVH_ENDPOINT}
+      - OVH_APPLICATION_KEY=${OVH_APPLICATION_KEY}
+      - OVH_APPLICATION_SECRET=${OVH_APPLICATION_SECRET}
+      - OVH_CONSUMER_KEY=${OVH_CONSUMER_KEY}
       - TZ=Europe/Zurich
     command:
       - '--global.checkNewVersion=true'
@@ -27,20 +31,22 @@ services:
       - '--providers.docker.exposedByDefault=false'
       - '--providers.docker.network=${TRAEFIK_PUBLIC_NETWORK}'
       - '--providers.docker.swarmMode=false'
-      # WEBMIN on localhost (8080)
-      - '--api.insecure=true'
-      - '--api.dashboard'
       # Listen to incoming HTTP requests (80)
       - '--entryPoints.web.address=:80'
       # Listen to HTTPS (443)
       - '--entryPoints.websecure.address=:443'
-      - '--certificatesresolvers.cloudflare.acme.email=${LETSENCRYPT_EMAIL}'
-      - '--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json'
-      - '--certificatesresolvers.cloudflare.acme.dnschallenge=true'
-      - '--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare'
+      - '--certificatesresolvers.dnsresolver.acme.email=${LETSENCRYPT_EMAIL}'
+      - '--certificatesresolvers.dnsresolver.acme.storage=/letsencrypt/acme.json'
+      - '--certificatesresolvers.dnsresolver.acme.dnschallenge=true'
+      # - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=cloudflare'
+      - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=ovh'
       # Listen to other services
       - '--entryPoints.ssh.address=:22'
       - '--entryPoints.pg.address=:5432'
+      # WEBMIN on localhost (8080)
+      # - '--api.insecure=true'
+      # - '--api.dashboard'
       # DEBUG
+      - '--log.level=INFO'
       # - '--log.level=DEBUG'
-      # - '--certificatesresolvers.cloudflare.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'
+      # - '--certificatesresolvers.dnsresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'

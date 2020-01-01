@@ -46,6 +46,15 @@ Here are all the default values:
     PHPMEMCACHEDADMIN_DOMAIN=phpmemcachedadmin
     PHPMEMCACHEDADMIN_PATH=phpmemcachedadmin
 
+### Let's Encrypt and OVH
+
+Check the full tutorial at https://medium.com/nephely/configure-traefik-for-the-dns-01-challenge-with-ovh-as-dns-provider-c737670c0434
+
+It will make you create an application key for your account (using wildchar * in example below, which will allow traefik to manage all your OVH domains)
+
+    curl -XPOST -H "X-Ovh-Application: <application_key>" -H "Content-type: application/json" https://eu.api.ovh.com/1.0/auth/credential -d '{ "accessRules":[{"method":"POST","path":"/domain/zone/*/record"},{"method":"POST","path":"/domain/zone/*/refresh"},{"method":"DELETE","path":"/domain/zone/*/record/*"}],"redirection": "https://www.ovh.com/manager"}'
+
+For the record, the API console is located at https://api.ovh.com/console
 
 ### Sanity checks
 
