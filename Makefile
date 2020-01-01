@@ -64,6 +64,7 @@ db: check-db
 		-f docker-compose.networks.yml \
 		-f docker-compose.db.yml \
 		-f docker-compose.proxy.yml \
+		-f docker-compose.proxy.local.yml \
 	config > docker-stack.yml
 
 
