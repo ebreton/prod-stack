@@ -122,7 +122,7 @@ ifeq ($(wildcard docker-stack.yml),)
 endif
 
 pull: check-stack
-	docker network create $(TRAEFIK_PUBLIC_NETWORK)
+	docker network create $(TRAEFIK_PUBLIC_NETWORK) || true
 	docker-compose -f docker-stack.yml pull
 
 # used for local developement
