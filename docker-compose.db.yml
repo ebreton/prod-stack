@@ -29,4 +29,4 @@ services:
       - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
       - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
       - "traefik.http.routers.phpmyadmin.tls.certresolver=dnsresolver"
-      - "traefik.http.routers.phpmyadmin.rule=Host:${PHPMYADMIN_DOMAIN};PathPrefixStrip:${PHPMYADMIN_PATH}"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`${PHPMYADMIN_DOMAIN}`) && PathPrefix(`${PHPMYADMIN_PATH}`)"

@@ -20,4 +20,4 @@ services:
       - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
       - "traefik.http.routers.phpmemcachedadmin.entrypoints=websecure"
       - "traefik.http.routers.phpmemcachedadmin.tls.certresolver=dnsresolver"
-      - "traefik.http.routers.phpmemcachedadmin.rule=Host:${PHPMEMCACHEDADMIN_DOMAIN};PathPrefixStrip:/${PHPMEMCACHEDADMIN_PATH}"
+      - "traefik.http.routers.phpmemcachedadmin.rule=Host(`${PHPMEMCACHEDADMIN_DOMAIN}`) && PathPrefix(`${PHPMEMCACHEDADMIN_PATH}`)"
