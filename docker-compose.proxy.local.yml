@@ -10,16 +10,16 @@ services:
       - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
       # global redirect to https
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.redirects.rule=hostregexp(`{host:.+}`)"
-      - "traefik.http.routers.redirects.entrypoints=web"
-      - "traefik.http.routers.redirects.middlewares=redirect-to-https"
-      # webmin protected by BasicAuth
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+      # BasicAuth middleware
       - "traefik.http.middlewares.ask-basic-auth.basicauth.users=${BASIC_AUTH}"
-      - "traefik.http.routers.traefik-webmin.rule=Host(`${TRAEFIK_DOMAIN}`)"
+      # Traefik webmin
       - "traefik.http.routers.traefik-webmin.entrypoints=websecure"
-      - "traefik.http.routers.traefik-webmin.tls.certresolver=dnsresolver"
       - "traefik.http.routers.traefik-webmin.service=api@internal"
+      - "traefik.http.routers.traefik-webmin.tls.certresolver=dnsresolver"
+      - "traefik.http.routers.traefik-webmin.rule=Host(`${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.traefik-webmin.middlewares=ask-basic-auth"
+      - "traefik.http.routers.traefik-webmin.middlewares=redirect-to-https"
 
   whoami:
     # A container that exposes an API to show its IP address
@@ -28,6 +28,11 @@ services:
       # Explicitly tell Traefik to expose this container
       - "traefik.enable=true"
       - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
+      # redirect to https
+      - "traefik.http.routers.plain-whoami.rule=Host(`${WHOAMI_DOMAIN}`)"
+      - "traefik.http.routers.plain-whoami.entrypoints=web"
+      - "traefik.http.routers.plain-whoami.middlewares=redirect-to-https"
+      # serve
+      - "traefik.http.routers.whoami.rule=Host(`${WHOAMI_DOMAIN}`)"
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls.certresolver=dnsresolver"
-      - "traefik.http.routers.whoami.rule=Host(`${WHOAMI_DOMAIN}`)"
