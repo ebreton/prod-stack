@@ -107,6 +107,9 @@ hello: check-env
 		--network=$(TRAEFIK_PUBLIC_NETWORK) \
 		--label "traefik.enable=true" \
 		--label "traefik.docker.network=$(TRAEFIK_PUBLIC_NETWORK)" \
+		--label "traefik.http.routers.plain-hello.entrypoints=web" \
+		--label "traefik.http.routers.plain-hello.rule=Host(\`$(HELLO_DOMAIN)\`)" \
+		--label "traefik.http.routers.plain-hello.middlewares=redirect-to-https" \
 		--label "traefik.http.routers.hello.entrypoints=websecure" \
 		--label "traefik.http.routers.hello.tls.certresolver=dnsresolver" \
 		--label "traefik.http.routers.hello.rule=Host(\`$(HELLO_DOMAIN)\`)" \
