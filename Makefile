@@ -2,6 +2,7 @@ ps:
 	# A lightly formatted version of docker ps
 	docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}} ago'
 
+init: check-env check-db pull
 
 check-env:
 ifeq ($(wildcard .env),)
@@ -55,7 +56,7 @@ ifeq ($(wildcard etc/db.env),)
 	sed -i s/password_root/$(SECRET_ROOT)/g etc/db.env
 	sed -i s/password_user/$(SECRET_USER)/g etc/db.env
 	@echo "Generated etc/db.env"
-	@echo ">> Check values"
+	@echo "  \033[31m>> Check its default values\033[0m"
 	@exit 1
 endif
 

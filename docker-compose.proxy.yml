@@ -8,8 +8,6 @@ services:
       # HTTP & HTTPS
       - '80:80'
       - '443:443'
-      # The Web UI (enabled by --api.insecure=true)
-      # - '127.0.0.1:8080:8080'
       # Other services
       # - '${SSH_PORT}:22'
       # - '${PG_PORT}:5432'
@@ -24,6 +22,7 @@ services:
     command:
       - '--global.checkNewVersion=true'
       - '--global.sendAnonymousUsage=false'
+
       # DOCKER (Dynamic config)
       - '--providers.docker'
       - '--providers.docker.watch=true'
@@ -31,6 +30,7 @@ services:
       - '--providers.docker.exposedByDefault=false'
       - '--providers.docker.network=${TRAEFIK_PUBLIC_NETWORK}'
       - '--providers.docker.swarmMode=false'
+
       # Listen to incoming HTTP requests (80)
       - '--entryPoints.web.address=:80'
       # Listen to HTTPS (443)
@@ -38,15 +38,18 @@ services:
       - '--certificatesresolvers.dnsresolver.acme.email=${LETSENCRYPT_EMAIL}'
       - '--certificatesresolvers.dnsresolver.acme.storage=/letsencrypt/acme.json'
       - '--certificatesresolvers.dnsresolver.acme.dnschallenge=true'
-      # - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=cloudflare'
-      - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=ovh'
+
+      # Set your DNS provider
+      - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=cloudflare'
+      # - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=ovh'
+
       # Listen to other services
       # - '--entryPoints.ssh.address=:22'
       # - '--entryPoints.pg.address=:5432'
-      # WEBMIN on localhost (8080)
-      # - '--api.insecure=true'
+
+      # WEBMIN
       - '--api.dashboard'
+
       # DEBUG
       - '--log.level=INFO'
-      # - '--log.level=DEBUG'
       # - '--certificatesresolvers.dnsresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'
