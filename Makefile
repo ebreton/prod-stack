@@ -25,14 +25,14 @@ LETSENCRYPT_EMAIL?=admin@domain.com
 CLOUDFLARE_EMAIL?=admin@domain.com
 CLOUDFLARE_API_KEY?=api-key
 
-proxy: check-env
+proxy-swarm: check-env
 	docker-compose \
 		-f docker-compose.networks.yml \
 		-f docker-compose.proxy.yml \
 		-f docker-compose.proxy.deploy.yml \
 	config > docker-stack.yml
 
-proxy-local: check-env
+proxy: check-env
 	docker-compose \
 		-f docker-compose.networks.yml \
 		-f docker-compose.proxy.yml \
@@ -107,6 +107,9 @@ hello: check-env
 		--network=$(TRAEFIK_PUBLIC_NETWORK) \
 		--label "traefik.enable=true" \
 		--label "traefik.docker.network=$(TRAEFIK_PUBLIC_NETWORK)" \
+		--label "traefik.http.routers.plain-hello.entrypoints=web" \
+		--label "traefik.http.routers.plain-hello.rule=Host(\`$(HELLO_DOMAIN)\`)" \
+		--label "traefik.http.routers.plain-hello.middlewares=redirect-to-https" \
 		--label "traefik.http.routers.hello.entrypoints=websecure" \
 		--label "traefik.http.routers.hello.tls.certresolver=dnsresolver" \
 		--label "traefik.http.routers.hello.rule=Host(\`$(HELLO_DOMAIN)\`)" \
@@ -122,12 +125,12 @@ ifeq ($(wildcard docker-stack.yml),)
 	@exit 1
 endif
 
-pull: check-stack
+pull: proxy check-stack
 	docker network create $(TRAEFIK_PUBLIC_NETWORK) || true
 	docker-compose -f docker-stack.yml pull
 
 # used for local developement
-build: check-stack proxy-local
+build: proxy check-stack
 	docker-compose -f docker-stack.yml build
 
 up: check-stack
