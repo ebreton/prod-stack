@@ -37,7 +37,13 @@ services:
       # Listen to HTTPS (443)
       - '--entryPoints.websecure.address=:443'
 
-      # Set DNS providers
+      # Set HTTP challenge
+      - '--certificatesResolvers.http-resolver.acme.email=${LETSENCRYPT_EMAIL}'
+      - '--certificatesResolvers.http-resolver.acme.storage=/letsencrypt/acme-http.json'
+      - '--certificatesResolvers.http-resolver.acme.httpChallenge=true'
+      - '--certificatesResolvers.http-resolver.acme.httpChallenge.entryPoint=web'
+
+      # Set DNS challenges
       - '--certificatesresolvers.dns-cloudflare.acme.email=${LETSENCRYPT_EMAIL}'
       - '--certificatesresolvers.dns-cloudflare.acme.storage=/letsencrypt/acme-cloudflare.json'
       - '--certificatesresolvers.dns-cloudflare.acme.dnschallenge=true'
