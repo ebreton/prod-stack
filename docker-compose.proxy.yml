@@ -38,10 +38,10 @@ services:
       - '--entryPoints.websecure.address=:443'
 
       # Set HTTP challenge
-      - '--certificatesResolvers.http-resolver.acme.email=${LETSENCRYPT_EMAIL}'
-      - '--certificatesResolvers.http-resolver.acme.storage=/letsencrypt/acme-http.json'
-      - '--certificatesResolvers.http-resolver.acme.httpChallenge=true'
-      - '--certificatesResolvers.http-resolver.acme.httpChallenge.entryPoint=web'
+      - '--certificatesResolvers.httpresolver.acme.email=${LETSENCRYPT_EMAIL}'
+      - '--certificatesResolvers.httpresolver.acme.storage=/letsencrypt/acme-http.json'
+      - '--certificatesResolvers.httpresolver.acme.httpChallenge=true'
+      - '--certificatesResolvers.httpresolver.acme.httpChallenge.entryPoint=web'
 
       # Set DNS challenges
       - '--certificatesresolvers.dns-cloudflare.acme.email=${LETSENCRYPT_EMAIL}'
