@@ -19,7 +19,7 @@ services:
       - "traefik.http.routers.plain-webmin.middlewares=redirect-to-https"
 
       - "traefik.http.routers.traefik-webmin.entrypoints=websecure"
-      - "traefik.http.routers.traefik-webmin.tls.certresolver=dnsresolver"
+      - "traefik.http.routers.traefik-webmin.tls.certresolver=dns-ovh"
       - "traefik.http.routers.traefik-webmin.rule=Host(`${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.traefik-webmin.service=api@internal"
 
@@ -41,4 +41,4 @@ services:
       - "traefik.http.routers.plain-whoami.middlewares=redirect-to-https"
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.rule=Host(`${WHOAMI_DOMAIN}`)"
-      - "traefik.http.routers.whoami.tls.certresolver=dnsresolver"
+      - "traefik.http.routers.whoami.tls.certresolver=dns-ovh"

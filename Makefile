@@ -111,7 +111,7 @@ hello: check-env
 		--label "traefik.http.routers.plain-hello.rule=Host(\`$(HELLO_DOMAIN)\`)" \
 		--label "traefik.http.routers.plain-hello.middlewares=redirect-to-https" \
 		--label "traefik.http.routers.hello.entrypoints=websecure" \
-		--label "traefik.http.routers.hello.tls.certresolver=dnsresolver" \
+		--label "traefik.http.routers.hello.tls.certresolver=dns-ovh" \
 		--label "traefik.http.routers.hello.rule=Host(\`$(HELLO_DOMAIN)\`)" \
 	dockercloud/hello-world
 

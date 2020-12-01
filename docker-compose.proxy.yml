@@ -68,4 +68,6 @@ services:
 
       # DEBUG
       - '--log.level=INFO'
-      # - '--certificatesresolvers.dnsresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'
+      # - '--certificatesresolvers.dns-ovh.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'
+      # - '--certificatesresolvers.dns-infomaniak.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'
+      # - '--certificatesresolvers.dns-cloudflare.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'

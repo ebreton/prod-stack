@@ -16,11 +16,11 @@ services:
       - '--entryPoints.web.address=:80'
       # Listen to HTTPS (443)
       - '--entryPoints.websecure.address=:443'
-      - '--certificatesresolvers.dnsresolver.acme.email=${LETSENCRYPT_EMAIL}'
-      - '--certificatesresolvers.dnsresolver.acme.storage=/letsencrypt/acme.json'
-      - '--certificatesresolvers.dnsresolver.acme.dnschallenge=true'
-      # - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=cloudflare'
-      - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=ovh'
+      - '--certificatesresolvers.dns-ovh.acme.email=${LETSENCRYPT_EMAIL}'
+      - '--certificatesresolvers.dns-ovh.acme.storage=/letsencrypt/acme.json'
+      - '--certificatesresolvers.dns-ovh.acme.dnschallenge=true'
+      # - '--certificatesresolvers.dns-ovh.acme.dnschallenge.provider=cloudflare'
+      - '--certificatesresolvers.dns-ovh.acme.dnschallenge.provider=ovh'
       # Listen to other services
       - '--entryPoints.ssh.address=:22'
       - '--entryPoints.pg.address=:5432'
@@ -43,6 +43,6 @@ services:
         - "traefik.http.middlewares.ask-basic-auth.basicauth.users=${BASIC_AUTH}"
         - "traefik.http.routers.traefik-webmin.rule=Host(`${TRAEFIK_DOMAIN}`)"
         - "traefik.http.routers.traefik-webmin.entrypoints=websecure"
-        - "traefik.http.routers.traefik-webmin.tls.certresolver=dnsresolver"
+        - "traefik.http.routers.traefik-webmin.tls.certresolver=dns-ovh"
         - "traefik.http.routers.traefik-webmin.service=api@internal"
         - "traefik.http.routers.traefik-webmin.middlewares=ask-basic-auth"
