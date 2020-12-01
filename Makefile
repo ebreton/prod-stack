@@ -131,16 +131,16 @@ pull: proxy check-stack
 
 # used for local developement
 build: proxy check-stack
-	docker-compose -f docker-stack.yml build
+	docker-compose -f docker-stack.yml build $(services)
 
 up: check-stack
-	docker-compose -f docker-stack.yml up -d
+	docker-compose -f docker-stack.yml up -d $(services) 
 
 down: check-stack
 	docker-compose -f docker-stack.yml down
 
 stop: check-stack
-	docker-compose -f docker-stack.yml stop
+	docker-compose -f docker-stack.yml stop $(services)
 
 logs: check-stack
-	docker-compose -f docker-stack.yml logs --tail 10 -f
+	docker-compose -f docker-stack.yml logs --tail 10 -f $(services)
