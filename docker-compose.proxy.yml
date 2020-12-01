@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   traefik:
-    image: traefik:v2.0
+    image: traefik:v2
     restart: unless-stopped
     ports:
       # HTTP & HTTPS
@@ -14,6 +14,7 @@ services:
     environment:
       - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
       - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
+      - INFOMANIAK_ACCESS_TOKEN=${INFOMANIAK_ACCESS_TOKEN}
       - OVH_ENDPOINT=${OVH_ENDPOINT}
       - OVH_APPLICATION_KEY=${OVH_APPLICATION_KEY}
       - OVH_APPLICATION_SECRET=${OVH_APPLICATION_SECRET}
@@ -35,13 +36,22 @@ services:
       - '--entryPoints.web.address=:80'
       # Listen to HTTPS (443)
       - '--entryPoints.websecure.address=:443'
-      - '--certificatesresolvers.dnsresolver.acme.email=${LETSENCRYPT_EMAIL}'
-      - '--certificatesresolvers.dnsresolver.acme.storage=/letsencrypt/acme.json'
-      - '--certificatesresolvers.dnsresolver.acme.dnschallenge=true'
 
-      # Set your DNS provider
-      - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=cloudflare'
-      # - '--certificatesresolvers.dnsresolver.acme.dnschallenge.provider=ovh'
+      # Set DNS providers
+      - '--certificatesresolvers.dns-cloudflare.acme.email=${LETSENCRYPT_EMAIL}'
+      - '--certificatesresolvers.dns-cloudflare.acme.storage=/letsencrypt/acme-cloudflare.json'
+      - '--certificatesresolvers.dns-cloudflare.acme.dnschallenge=true'
+      - '--certificatesresolvers.dns-cloudflare.acme.dnschallenge.provider=cloudflare'
+
+      - '--certificatesresolvers.dns-infomaniak.acme.email=${LETSENCRYPT_EMAIL}'
+      - '--certificatesresolvers.dns-infomaniak.acme.storage=/letsencrypt/acme-infomaniak.json'
+      - '--certificatesresolvers.dns-infomaniak.acme.dnschallenge=true'
+      - '--certificatesresolvers.dns-infomaniak.acme.dnschallenge.provider=infomaniak'
+
+      - '--certificatesresolvers.dns-ovh.acme.email=${LETSENCRYPT_EMAIL}'
+      - '--certificatesresolvers.dns-ovh.acme.storage=/letsencrypt/acme.json'
+      - '--certificatesresolvers.dns-ovh.acme.dnschallenge=true'
+      - '--certificatesresolvers.dns-ovh.acme.dnschallenge.provider=ovh'
 
       # Listen to other services
       # - '--entryPoints.ssh.address=:22'
