@@ -127,7 +127,7 @@ endif
 
 pull: proxy check-stack
 	docker network create $(TRAEFIK_PUBLIC_NETWORK) || true
-	docker-compose -f docker-stack.yml pull
+	docker-compose -f docker-stack.yml pull $(services)
 
 # used for local developement
 build: proxy check-stack
